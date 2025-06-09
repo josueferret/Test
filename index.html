@@ -55,9 +55,12 @@
       <input type="range" id="barra-control" value="0" min="0" step="0.01" />
     </div>
 
-    <script>
+<script>
       const video = document.getElementById("video-interactivo");
       const slider = document.getElementById("barra-control");
+
+      // Variable para saber si ya hemos "desbloqueado" el video en el móvil.
+      let videoDesbloqueado = false;
 
       // Cuando se cargan los datos del video...
       video.addEventListener("loadedmetadata", () => {
@@ -67,18 +70,31 @@
 
       // Función que actualiza el frame del video.
       function actualizarFrame() {
-        video.currentTime = slider.value;
+        // Solo actualizamos si el video está listo
+        if (video.readyState >= 2) {
+            video.currentTime = slider.value;
+        }
       }
 
       // Cuando el usuario mueve la barra...
       slider.addEventListener("input", () => {
-        // ...le pedimos al navegador que ejecute la actualización en el próximo ciclo de renderizado.
-        // Esto es más eficiente y suave que actualizarlo directamente.
+        
+        // --- INICIO DEL ARREGLO PARA MÓVILES ---
+        if (!videoDesbloqueado) {
+          // Si es la primera interacción, intentamos reproducir y pausar.
+          // Esto "desbloquea" el video en la mayoría de los navegadores móviles.
+          video.play();
+          video.pause();
+          videoDesbloqueado = true;
+        }
+        // --- FIN DEL ARREGLO ---
+
+        // Pedimos al navegador que ejecute la actualización.
         window.requestAnimationFrame(actualizarFrame);
       });
-
-      // Para asegurar que el primer frame se muestre correctamente al cargar.
-      video.addEventListener(
+      
+      // Para asegurar que el primer frame se muestre correctamente al cargar en escritorio.
+       video.addEventListener(
         "canplay",
         () => {
           video.pause();
