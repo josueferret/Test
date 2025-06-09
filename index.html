@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Controlado por Scroll</title>
+    <style>
+      /* Estilos para centrar todo y darle un aspecto limpio */
+      body {
+        font-family: sans-serif;
+        background-color: #111;
+        color: #eee;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden; /* Evita barras de scroll en el cuerpo */
+      }
+
+      .video-container {
+        width: 80%;
+        max-width: 900px;
+        text-align: center;
+      }
+
+      /* El video debe ajustarse a su contenedor */
+      #video-interactivo {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+      }
+
+      /* Estilos para nuestra barra de control */
+      #barra-control {
+        width: 100%;
+        margin-top: 20px;
+        cursor: pointer;
+      }
+
+      h1 {
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="video-container">
+      <h1>Mueve la barra para controlar el video</h1>
+
+      <video id="video-interactivo" muted playsinline preload="auto">
+        <source src="mivideocorregido.mp4" type="video/mp4" />
+        Tu navegador no soporta el tag de video.
+      </video>
+
+      <input type="range" id="barra-control" value="0" min="0" step="0.01" />
+    </div>
+
+    <script>
+      const video = document.getElementById("video-interactivo");
+      const slider = document.getElementById("barra-control");
+
+      // Cuando se cargan los datos del video...
+      video.addEventListener("loadedmetadata", () => {
+        // ...ajustamos el máximo de la barra a la duración del video.
+        slider.max = video.duration;
+      });
+
+      // Función que actualiza el frame del video.
+      function actualizarFrame() {
+        video.currentTime = slider.value;
+      }
+
+      // Cuando el usuario mueve la barra...
+      slider.addEventListener("input", () => {
+        // ...le pedimos al navegador que ejecute la actualización en el próximo ciclo de renderizado.
+        // Esto es más eficiente y suave que actualizarlo directamente.
+        window.requestAnimationFrame(actualizarFrame);
+      });
+
+      // Para asegurar que el primer frame se muestre correctamente al cargar.
+      video.addEventListener(
+        "canplay",
+        () => {
+          video.pause();
+        },
+        { once: true }
+      );
+    </script>
+  </body>
+</html>
